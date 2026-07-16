@@ -1,0 +1,19 @@
+业余无线电通信模式与调制.md
+  s_9af62bdc9dd748::t_052304e940d714 250-267
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "48467ca3e3d54a94acde80afb85cc76c9f91f0f5",
+  "prompts": {},
+  "sessions": {
+    "s_9af62bdc9dd748": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38a3b542-471a-47db-a928-d5f61a26f3d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "quanwei1 <quanwei1@xiaohongshu.com>"
+    }
+  }
+}
