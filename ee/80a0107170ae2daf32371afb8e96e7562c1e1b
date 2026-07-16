@@ -1,0 +1,19 @@
+业余无线电呼号组成与国际前缀.md
+  s_9af62bdc9dd748::t_5a18a13acf630a 1-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "ee80a0107170ae2daf32371afb8e96e7562c1e1b",
+  "prompts": {},
+  "sessions": {
+    "s_9af62bdc9dd748": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38a3b542-471a-47db-a928-d5f61a26f3d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "quanwei1 <quanwei1@xiaohongshu.com>"
+    }
+  }
+}
