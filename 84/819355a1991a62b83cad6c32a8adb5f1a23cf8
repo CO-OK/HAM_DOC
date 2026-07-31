@@ -1,0 +1,33 @@
+业余无线电天线原理.md
+  s_9af62bdc9dd748::t_cfc228f232e07f 1-139
+业余无线电天线是谐振回路.md
+  s_9af62bdc9dd748::t_ef0ab57a8cabbf 30-78
+  s_9af62bdc9dd748::t_3c6784337f4e75 330,344-345,347-350,352,356,362-363,365,373-374
+  s_9af62bdc9dd748::t_21ab9868221150 128,137,139-329
+  s_9af62bdc9dd748::t_b693ee19835e57 1-29,79-127,129-136,138,331-343,346,351,353-355,357-361,364,366-372
+业余无线电电离层与短波传播.md
+  s_9af62bdc9dd748::t_43328a0e7d09c0 290-332
+  s_9af62bdc9dd748::t_ba658bd2784d92 333
+  s_9af62bdc9dd748::t_706e5eb2b13d46 186-220,263
+  s_9af62bdc9dd748::t_45dd158a4cf7a3 221-248,250-262
+  s_9af62bdc9dd748::t_145bcc0adfa94e 146-150,154-184,265-288,334-340,344-351
+  s_9af62bdc9dd748::t_89981a90d29ce1 289
+  s_9af62bdc9dd748::t_da5e4f319c6bef 185
+  s_9af62bdc9dd748::t_c79ad4ea06c3bc 264
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "84819355a1991a62b83cad6c32a8adb5f1a23cf8",
+  "prompts": {},
+  "sessions": {
+    "s_9af62bdc9dd748": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38a3b542-471a-47db-a928-d5f61a26f3d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "quanwei1 <quanwei1@xiaohongshu.com>"
+    }
+  }
+}
