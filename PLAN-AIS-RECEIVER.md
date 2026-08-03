@@ -204,6 +204,12 @@ ais-receiver/                                    # 工程根目录
 
 ```yaml
 # ========================================
+# ⚠️ 天线极化决定 90% 接收效果
+# ========================================
+# VHF AIS 必须用 **垂直极化**（偶极子立起来）
+# 平放 = 损失 ~20 dB = 几乎收不到信号
+# 详见 SDR-AIS上海船舶监听指南.md 第 8 节"天线方案"
+# ========================================
 # AIS 接收工程配置
 # 修改后需要重启（make restart）生效
 # ========================================
@@ -471,21 +477,38 @@ log() {
 9. 打印 "启动成功 → 浏览器已打开"
 
 **命令行构造**（从 YAML 拼出来）：
+
+> ⚠️ **实施前必做**：先 `AIS-catcher -h` 验证下列参数！下面是基于 v0.57 文档的草图，参数名/大小写/用法可能随版本变化。
+>
+> **关键参数速查**（按 `--help` 实际输出调整）：
+> - `-d N` — RTL-SDR 设备索引（多 SDR 时指定）
+> - `-v N` — verbose 级别
+> - `-s Hz` — 采样率
+> - `-a Hz` — 接收带宽
+> - `-gr tuner <dB>` — Tuner 增益（**小写 tuner**）
+> - `-gr rtlagc on/off` — RTL AGC（**必须 off**）
+> - `-gr biastee on/off` — Bias tee（V4 有 5V 输出）
+> - `-p PPM` — 频率校正
+> - `-N PORT` — Web UI 端口
+> - `-N STATION "name"` / `-N LAT lat` / `-N LON lon` / `-N SHARE_LOC on/off`
+> - `-f file.nmea` — NMEA 输出文件
+
 ```bash
 AIS-catcher \
+    -d 0 \
     -v $(config_get ais_catcher.verbose) \
     -s $(config_get ais_catcher.sample_rate) \
     -a $(config_get ais_catcher.bandwidth) \
+    -gr tuner $(config_get ais_catcher.gain) \
+    -gr rtlagc $(config_get ais_catcher.rtlagc) \
+    -gr biastee $(config_get ais_catcher.biastee) \
+    -p $(config_get ais_catcher.ppm) \
     -N $(config_get ais_catcher.web_port) \
     -N STATION "$(config_get station.name)" \
     -N LAT $(config_get station.lat) \
     -N LON $(config_get station.lon) \
     -N SHARE_LOC $(config_get station.share_loc) \
-    -f "$(date +%Y-%m-%d).nmea" \
-    -gr TUNER $(config_get ais_catcher.gain) \
-    RTLAGC $(config_get ais_catcher.rtlagc) \
-    BIASTEE $(config_get ais_catcher.biastee) \
-    -p $(config_get ais_catcher.ppm)
+    -f "$(date +%Y-%m-%d).nmea"
 ```
 
 ### 5.5 scripts/stop.sh
@@ -521,7 +544,7 @@ fi
 if [[ -f "$out_log" ]] && (( $(stat -f%z "$out_log") > max_size * 1024 * 1024 )); then
     mv "$out_log" "$out_log.$(date +%Y%m%d-%H%M%S).old"
     # 重启进程来切新日志（用 SIGHUP 不行，因为 AIS-catcher 不支持 reopen log）
-    bash scripts/restart.sh
+    make restart  # Makefile 已有 restart: stop start
 fi
 
 # 2. 删老的日志
