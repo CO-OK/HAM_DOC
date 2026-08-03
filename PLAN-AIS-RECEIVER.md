@@ -481,7 +481,7 @@ log() {
 > ⚠️ **实施前必做**：先 `AIS-catcher -h` 验证下列参数！下面是基于 v0.57 文档的草图，参数名/大小写/用法可能随版本变化。
 >
 > **关键参数速查**（按 `--help` 实际输出调整）：
-> - `-d N` — RTL-SDR 设备索引（多 SDR 时指定）
+> - `-d:N` — RTL-SDR 设备索引（**带冒号**！`-d 0` 是序列号会找不到设备）
 > - `-v N` — verbose 级别
 > - `-s Hz` — 采样率
 > - `-a Hz` — 接收带宽
@@ -489,13 +489,15 @@ log() {
 > - `-gr rtlagc on/off` — RTL AGC（**必须 off**）
 > - `-gr biastee on/off` — Bias tee（V4 有 5V 输出）
 > - `-p PPM` — 频率校正
+> - `-M D|T|M` — Meta 数据：`D` = signalpower+ppm（调参时打开），`T` = 时间戳，`M` = 国家
 > - `-N PORT` — Web UI 端口
 > - `-N STATION "name"` / `-N LAT lat` / `-N LON lon` / `-N SHARE_LOC on/off`
+> - `-X on/off` — aiscatcher.org 社区共享（**默认 ON**，不需要要显式 off）
 > - `-f file.nmea` — NMEA 输出文件
 
 ```bash
 AIS-catcher \
-    -d 0 \
+    -d:0 \
     -v $(config_get ais_catcher.verbose) \
     -s $(config_get ais_catcher.sample_rate) \
     -a $(config_get ais_catcher.bandwidth) \
@@ -503,6 +505,8 @@ AIS-catcher \
     -gr rtlagc $(config_get ais_catcher.rtlagc) \
     -gr biastee $(config_get ais_catcher.biastee) \
     -p $(config_get ais_catcher.ppm) \
+    -M $(config_get ais_catcher.meta) \
+    -X $(config_get ais_catcher.community_share) \
     -N $(config_get ais_catcher.web_port) \
     -N STATION "$(config_get station.name)" \
     -N LAT $(config_get station.lat) \
@@ -864,3 +868,109 @@ fi
 ---
 
 *本计划由 Mavis 编写，等待另一个 agent 落地实施。*
+
+---
+
+## 14. 实施后补记（v0.1.0 → v0.1.1 的踩坑）
+
+> 落地实施时发现、计划未覆盖的 4 条关键问题。新人按本计划实施前**必读**。
+
+### 14.1 macOS 安装没有 homebrew tap
+
+❌ **计划原文**：`brew tap abcd567a/tap && brew install ais-catcher`
+
+✅ **实际情况**：`abcd567a/tap` 是某用户给 Raspberry Pi 写 systemd 服务的脚本仓库，**不是 AIS-catcher 官方 homebrew 仓库**，clone 会报 404。
+
+**正确做法（macOS）**：
+```bash
+# 1. 装系统依赖
+brew install librtlsdr pkg-config
+
+# 2. 从 GitHub 源码编
+git clone --depth 1 https://github.com/jvde-github/AIS-catcher.git
+cd AIS-catcher
+make CFLAGS="-DHASWEBVIEWER"    # ⚠️ 必须显式加这个 flag！
+cp AIS-catcher /opt/homebrew/bin/
+chmod +x /opt/homebrew/bin/AIS-catcher
+```
+
+⚠️ **WebViewer 默认未编译**：AIS-catcher 的 `Makefile` **不会**自动加 `-DHASWEBVIEWER`（只有 CMakeLists.txt 才会）。用默认 `make` 或 `make rtl-only` 出来的 binary 启动时报 `WebViewer support not compiled in.` 然后退出。**必须** `make CFLAGS="-DHASWEBVIEWER"`。
+
+### 14.2 设备索引语法
+
+❌ **计划原文**：`AIS-catcher -d 0`
+
+✅ **实际情况**：`AIS-catcher` 把 `-d 0` 解释成"序列号 0"（找不到设备，进程启动后报 `Receiver: cannot set up device.`）。**正确语法是 `-d:0`（带冒号）**。
+
+```bash
+# 错（当成 SN）
+AIS-catcher -d 0
+
+# 对（当成 index）
+AIS-catcher -d:0
+
+# 选 SN 才是
+AIS-catcher -d 00000001
+```
+
+实施时 `start.sh` 必须用 `-d:"$dev_idx"` 而不是 `-d "$dev_idx"`。
+
+### 14.3 社区共享默认 ON（隐私风险）
+
+AIS-catcher **默认** `-X on`，自动把收到的 AIS 数据上传到 `aiscatcher.org:4242` 社区 hub。每次启动日志会看到：
+
+```
+TCP feed: open socket for host: 185.77.96.227, port: 4242
+```
+
+**如果不想共享**，在 `config.yaml` 加：
+```yaml
+ais_catcher:
+  community_share: "off"    # 显式关闭
+```
+
+并在 `start.sh` 里把 `-X $(config_get ais_catcher.community_share)` 拼进命令行。**默认建议 off**（除非你想参与社区）。
+
+### 14.4 调参用 `-M D` + `verbose: 10`
+
+光看 `verbose: 5` 只能知道"收到 N 条"，但不知道**信号质量**。调参关键指标是 `signalpower` 和 `ppm`：
+
+✅ **推荐配置**（config.yaml）：
+```yaml
+ais_catcher:
+  verbose: 10                # 每 1 秒打统计（不是 5 秒）
+  meta: "D"                  # 关键！输出 signalpower + ppm
+```
+
+调参时从日志找 `signalpower: -XX.X dB`：
+| signalpower | 含义 |
+|-------------|------|
+| -20 ~ -35 dB | 极强信号（船 < 5 km） |
+| -35 ~ -50 dB | 良好（典型 5-20 km） |
+| -50 ~ -60 dB | 弱信号（> 20 km 或天线差） |
+| < -60 dB | 几乎无法解码，调增益/天线 |
+
+`ppm` 如果稳定在 ±3 之外，写到 `config.yaml` 的 `ppm` 字段修正（提升 ~5% 解码率）。
+
+### 14.5 增益起步值
+
+❌ **计划建议**：`gain: 30`（上海信号强 25-35）
+
+✅ **实测**（上海普陀，0:00 凌晨，V4 偶极立式）：
+- `gain: 30` → 0 msgs（夜里船少，阈值不够）
+- `gain: 42` → 1 msg/10s，signalpower -46 dB
+
+**建议起步值 38-42**（不是 25-35）。等白天船多了再降增益避免饱和。
+
+### 14.6 验收时间窗口
+
+❌ **计划原文**："启动后 30 秒内至少 1 艘船"（1.4.5 自检清单第 5 项）
+
+✅ **实际情况**：
+- 白天 8-22 点：满足（黄浦江/苏州河随时 10+ 艘）
+- 凌晨 0-5 点：**可能 0 艘**（船都停泊了）
+- 建议把验收门槛改成"白天"或加时间窗口
+
+---
+
+*补记 2026-08-04 · 实施 agent：Mavis*
