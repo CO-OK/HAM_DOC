@@ -36,7 +36,12 @@ RTL-SDR v4 覆盖 **24MHz - 1.766GHz**，住上海资源非常丰富。
   - 16 频道（156.8 MHz）是国际遇险/呼叫频道，平时很多船在喊话
   - 上海港务频道，能听到引航员调度集装箱船
 - **161.975 / 162.025 MHz**：AIS 自动识别系统
-  - 用 `AISMon` 或 `ShipPlotter` 解码，能看到周边所有船的位置、航向、目的地
+  - 调制是 GMSK 9600 bps，**SDR++ 自身解不了**，必须外挂解码软件
+  - 推荐：[**AIS-Catcher**](https://github.com/jvde-github/AIS-catcher)（开源、macOS 原生）+ **OpenCPN**（海图显示）
+  - SDR++ 里只把中心频率调到 **162.000 MHz**、带宽 50 kHz，让 AIS-Catcher 直接接管 RTL-SDR 也行
+  - 普陀区离黄浦江很近，一晚上能收 50-200 条船
+  - **详细配置见 [SDR-AIS上海船舶监听指南](./SDR-AIS上海船舶监听指南.md)**
+  - ⚠️ **关键点**：V3 偶极子默认是**水平极化**，船用 VHF 是**垂直极化**，损失 20 dB。把偶极子立起来！
 
 ### 📡 业余无线电（HAM 圈）
 
@@ -105,7 +110,7 @@ RTL-SDR v4 覆盖 **24MHz - 1.766GHz**，住上海资源非常丰富。
 | 1 | FM 广播 | 88-108 MHz | 5-15 dB | WFM | 200 kHz | 关 | 入门练手，De-emphasis 选 50µs |
 | 2 | 民航 ATC | 118-137 MHz | 20-35 dB | AM | 6-8 kHz | 关 | 双机场通联密集 |
 | 3 | 船舶 VHF | 156-162 MHz | 20-30 dB | NFM | 12.5 kHz | -130 dB | 守听 Ch16 = 156.800 MHz |
-| 4 | AIS | 161.975 / 162.025 MHz | 25-35 dB | NFM | 25 kHz | -130 dB | 配 AISMon/ShipPlotter 解码 |
+| 4 | AIS | **162.000 MHz**（覆盖 161.975 + 162.025 双频道） | 30-40 dB | RAW/NFM | 50 kHz | 关 | 配 **AIS-Catcher + OpenCPN** 解码，**详细见 [AIS 指南](./SDR-AIS上海船舶监听指南.md)** |
 | 5 | ADS-B | 1090 MHz | 35-49 dB | RAW | — | — | 配 dump1090，加 1090 MHz 滤波器效果更好 |
 | 6 | HAM 2m 中继 | 144-148 MHz | 20-30 dB | NFM | 12.5 kHz | -130 dB | 上海中继多 |
 | 7 | HAM 2m SSB | 144-148 MHz | 25-35 dB | USB | 2.4-3 kHz | -135 dB | 弱信号通联、EME |
