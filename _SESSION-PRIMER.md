@@ -51,7 +51,7 @@ HAM/
 ### 根目录
 
 - `_SESSION-PRIMER.md` — 本文件（开新 session 贴）
-- `SDR-玩法清单.md` — 玩法索引表（17 项，✅/⏳/❌ 状态）
+- `SDR-玩法清单.md` — 玩法索引表（17 项，已完成 / 进行中 / 未开始 / 不适用）
 - `PLAN-AIS-RECEIVER.md` — AIS 接收工程实施计划（独立项目）
 
 ---
@@ -62,7 +62,7 @@ HAM/
 - **设备**：RTL-SDR Blog V4（R828D tuner，24 MHz - 1.766 GHz，内置 LNA + bias tee）
 - **兴趣方向**：HAM 业余无线电、SDR 入门、上海本地频段监听
 - **沟通偏好**：直接、技术向、喜欢表格、中文
-- **当前状态**：SDR 已玩通 ADS-B / AIS，ATC 软件通了但飞机信号待天线优化
+- **当前状态**：SDR 已玩通 ADS-B / AIS，ATC 软件通了（飞机信号待 LNA 复测），RDS 文档已写（待实操）
 
 ---
 
@@ -80,11 +80,11 @@ HAM/
 
 ## 待办 / 未完成
 
-1. **ATC 飞机信号优化**：塔台已听清，飞机信号弱；已诊断为 quick start dipole 振子太短（10-20cm vs 应需 62cm），需换 62cm × 2 铜线
+1. **ATC 飞机信号优化**：塔台已听清，飞机信号弱。**物理规律**：塔台 vs 飞机差 ~30 dB（功率 + 天线增益 + 距离）。升级方向：加 **SPF5189 宽带 LNA +20 dB**（V4 bias-T 馈电）。详见 playbooks/atc-listening/ATC-上海监听起步.md §5/§6
 2. **天线升级方向**：ADS-B 1090 MHz 专用天线 + 滤波器 + LNA
 3. **ACARS 待试**：131.55 / 129.125 MHz，AM，SDR++ 自带解码
 4. **HAM 中继**：上海 RepeaterBook 3 个，70cm 段 439.6250/439.8250（Fusion，BR4AA/BR4AD）
-5. **playbook 填充**：玩法清单的"详情"列空着，玩通一个填一个
+5. **playbook 填充**：已写 2 份（atc-listening / rds-listening），其余 ~15 份待写
 6. **未学但相关**：Mode（AM/FM/SSB）、AGC 原理、FFT 窗函数、Sample Rate、IF 滤波细节、削波细节
 
 ---

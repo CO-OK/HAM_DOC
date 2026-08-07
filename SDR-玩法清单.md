@@ -28,7 +28,7 @@
 | 🟢 | **ADS-B 航空监视** | 1090 MHz | PPM | ⭐⭐⭐⭐⭐ | 已完成 | |
 | 🟢 | **AIS 船舶监视** | 162 MHz | GMSK | ⭐⭐⭐⭐⭐ | 已完成 | |
 | 🟢 | 民航 ATC 语音 | 118–137 MHz | AM | ⭐⭐⭐⭐⭐ | 进行中 | [playbooks/atc-listening/ATC-上海监听起步.md](playbooks/atc-listening/ATC-上海监听起步.md) <br> 待接入 LNA 复测 |
-| 🟢 | RDS 交通广播 | 88–108 MHz | WFM | ⭐⭐⭐⭐⭐ | 未开始 | |
+| 🟢 | RDS 交通广播 | 88–108 MHz | WFM | ⭐⭐⭐⭐⭐ | 进行中 | [playbooks/rds-listening/RDS-上海起步.md](playbooks/rds-listening/RDS-上海起步.md) |
 | 🟢 | HAM 中继台 | 144 / 430 MHz | FM | ⭐⭐⭐⭐ | 未开始 | |
 | 🟢 | 海事 VTS 语音 | 156–162 MHz | FM | ⭐⭐⭐ | 未开始 | |
 | 🟢 | 公众对讲机 | 409 MHz | FM | ⭐⭐ | 未开始 | |
